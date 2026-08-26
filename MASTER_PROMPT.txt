@@ -1,0 +1,102 @@
+MASTER PROMPT — Maharudra Solar Services
+
+Goal:
+Build a responsive marketing site "Maharudra Solar Services" (Vite + React + TypeScript) with a hero, promo card (clickable PM Surya Ghar image linking to https://pmsuryaghar.gov.in/#/), a simplified solar calculator/recommendation integrated into the contact flow, a solar-only chatbot "Rudra AI", documents checklist, and a WhatsApp enquiry flow. Optimize hero assets for fast load and include a fallback for older runs.
+
+Tech stack:
+- Frontend: React (Vite), TypeScript, Tailwind CSS (or existing styling system).
+- Static assets in public/.
+- LLM integration: client-side stub + note to proxy key server-side (do NOT hardcode production keys in client).
+
+Visual / UI:
+- Hero: left column text; right column media panel with a responsive hero image. Default should be an optimized WebP (800px & 400px sizes via srcset/picture) named public/hero-custom-800.webp and /hero-custom-400.webp. Provide a preload for the 800w WebP.
+- Promo card: use public/pm-surya-ghar.png; clicking it opens https://pmsuryaghar.gov.in/#/ in a new tab.
+- Contact section (#contact): simple form with fields:
+  - Name (required)
+  - Mobile number (required)
+  - Monthly electricity bill (optional numeric) — used to recommend system size
+- Documents checklist section (replaces old calculator fields): static list of required documents for the solar scheme.
+- Remove the "quick submit" duplicate; keep a single enquiry flow.
+- Chat widget: "Rudra AI" floating widget — solar-only assistant. Provide quick prompts and a slight reply delay to simulate friendly chat.
+- Replace any demo estimate overlay; hero should be clean and fast.
+
+Business logic:
+- Solar recommendation rules (final):
+  - monthly bill 0–3000 => recommend 3 kW (sample: 6×540W panels, ~330–390 units/mo, ~4,000–4,700 units/yr, ~240–300 sq.ft)
+  - monthly bill 3001–5000 => recommend 5 kW (9–10×540W, ~550–650 units/mo, ~6,600–7,800 units/yr, ~400–500 sq.ft)
+  - monthly bill >5000 => recommend contacting the team for a custom plan
+- On contact submit, open WhatsApp (wa.me) to +91 91124 32313 with a prefilled message: name, mobile, monthly bill, and recommendation text.
+
+Chatbot (Rudra AI):
+- Strong system prompt restricting responses to solar installation, calculations, documentation, Maharudra Solar offerings, and local incentives.
+- Client-side call to completions API if API key configured; document that keys must be proxied server-side in production.
+- Local fallback canned replies if API fails.
+- UX: quick prompts, typing-delay (e.g., 600–900ms per reply chunk), restrict suggestions to the product/plans listed above.
+
+Hero media & conversions:
+- Source video: public/hero-video-with-audio.mp4 (user-provided) or static hero-custom.png.
+- Preferred production formats: optimized WebP (static) or WebM (animation). GIF only if necessary.
+- FFmpeg commands (examples):
+  - PNG → WebP sizes:
+    ffmpeg -i public/hero-custom.png -vf "scale=800:-1" -q:v 50 public/hero-custom-800.webp
+    ffmpeg -i public/hero-custom.png -vf "scale=400:-1" -q:v 50 public/hero-custom-400.webp
+  - MP4 → WebM (animation recommended):
+    ffmpeg -i public/hero-video-with-audio.mp4 -c:v libvpx-vp9 -b:v 0 -crf 30 -an -vf "scale=800:-1" public/hero-video-800.webm
+  - MP4 → GIF (palette method, if needed):
+    ffmpeg -i public/hero-video-with-audio.mp4 -vf "fps=15,scale=800:-1:flags=lanczos,palettegen" -y public/palette.png
+    ffmpeg -i public/hero-video-with-audio.mp4 -i public/palette.png -filter_complex "fps=15,scale=800:-1:flags=lanczos[x];[x][1:v]paletteuse" -y public/hero.gif
+
+Performance & UX:
+- Replace large PNGs with WebP or AVIF; add srcset and <picture>.
+- Preload the primary hero 800 width asset in index.html.
+- Lazy-load below-the-fold images (loading="lazy").
+- Remove temporary DOM-replacement scripts after the build is up-to-date.
+- Use caching headers and a CDN in production.
+
+Files to create/update:
+- public/pm-surya-ghar.png
+- public/hero-custom.png (uploaded)
+- public/hero-custom-800.webp, public/hero-custom-400.webp
+- optional: public/hero.gif or public/hero-video-800.webm
+- src/App.tsx — hero markup with <picture>, promo card, stats, contact form, documents checklist, ChatWidget import
+- src/components/ChatWidget.tsx — Rudra AI widget
+- src/data/pricing.ts — plan entries (3.10 kW, 5 kW, Custom)
+- src/data/company.ts — contact phone +91 91124 32313, heroTitle, heroSubtitle, stats
+- index.html — add <link rel="preload" as="image" href="/hero-custom-800.webp"> and do not leave hotfix scripts
+
+Commands:
+- Dev: npm run dev
+- Build: npm run build
+- FFmpeg: see commands above
+
+Security & production notes:
+- Do NOT store LLM API keys in client-side code. Implement a server-side proxy endpoint.
+- Validate & sanitize any user input.
+- For WhatsApp Business API automatic sends, use a proper provider; current flow should open wa.me for user confirmation.
+- Document uploads: use S3 or similar with pre-signed URLs, scanning, and access control.
+
+Testing & verification:
+- Manual: verify on Chrome, Firefox, and mobile that the hero loads quickly and contact opens WhatsApp with prefilled text.
+- DevTools: Network tab should show hero-custom-800.webp served and small in size.
+- Unit: add tests for recommendation logic (monthly bill → plan).
+- Accessibility: provide alt text for images and aria-labels for interactive controls.
+
+Example prefilled WhatsApp message (encodeURIComponent):
+"Hello Maharudra Solar, I am [NAME]. Mobile: [MOBILE]. My monthly bill is [BILL]. Recommendation: [3kW/5kW/Custom request]. Please contact me."
+
+Extras & improvements:
+- Use animated WebP/WebM for animations instead of GIF.
+- Add analytics for CTA events.
+- Implement server endpoints for enquiries and document uploads.
+- Add rate-limiting, input validation, and optional CAPTCHA on forms.
+
+---
+Developer-ready checklist (short):
+1) Create Vite + React + TS project or open existing repo.
+2) Copy assets into public/ and run ffmpeg to optimize images.
+3) Implement hero <picture> and preload link in index.html.
+4) Implement contact form + recommendation logic + WhatsApp wa.me link.
+5) Add Rudra AI ChatWidget with client-side call + server proxy note.
+6) Optimize images site-wide, add caching, and test on multiple browsers.
+
+If you want this packaged differently (README, single-file App.tsx, or a Git patch), tell me which format and I will generate it.
