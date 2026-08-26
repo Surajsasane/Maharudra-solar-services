@@ -1,0 +1,90 @@
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  font-family: 'Manrope', sans-serif;
+  line-height: 1.5;
+  font-weight: 500;
+  color: #102d1f;
+  background: #f5faf6;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  background:
+    radial-gradient(circle at top, rgba(244, 197, 72, 0.18), transparent 30%),
+    linear-gradient(180deg, #f5faf6 0%, #edf8ef 100%);
+}
+
+#root {
+  min-height: 100vh;
+}
+
+img {
+  max-width: 100%;
+  display: block;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+@layer components {
+  .section-shell {
+    @apply mx-auto max-w-7xl px-4 sm:px-6 lg:px-8;
+  }
+
+  .section-badge {
+    @apply inline-flex items-center rounded-full border border-solar-200 bg-solar-50 px-3 py-1 text-xs font-bold uppercase tracking-[0.2em] text-solar-700;
+  }
+
+  .section-heading {
+    @apply text-3xl font-extrabold tracking-tight text-solar-900 sm:text-4xl;
+  }
+
+  .primary-button {
+    @apply inline-flex items-center justify-center gap-2 rounded-full bg-solar-700 px-6 py-3 text-sm font-semibold text-white shadow-soft transition hover:-translate-y-0.5 hover:bg-solar-800;
+  }
+
+  .secondary-button {
+    @apply inline-flex items-center justify-center gap-2 rounded-full border border-solar-200 bg-white px-6 py-3 text-sm font-semibold text-solar-800 transition hover:-translate-y-0.5 hover:border-solar-300 hover:bg-solar-50;
+  }
+
+  .glass-panel {
+    @apply border border-white/60 bg-white/80 backdrop-blur-md;
+  }
+
+  .soft-card {
+    @apply rounded-3xl border border-solar-100 bg-white shadow-soft transition duration-300;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
