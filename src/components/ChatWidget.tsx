@@ -89,8 +89,8 @@ function isSolarQuestion(input: string): boolean {
 
 function buildSolarFallbackReply(input: string): string {
   const text = input.toLowerCase();
-  const mentionsBill = /\b(\d{3,7})\b/.exec(input) || null;
-  const billValue = mentionsBill ? Number(mentionsBill[1]) : null;
+  const mentionsBill = /(?:₹\s*)?(\d{1,3}(?:,\d{3})+|\d{3,7})\b/.exec(input);
+  const billValue = mentionsBill ? Number(mentionsBill[1].replace(/,/g, '')) : null;
 
   if (billValue !== null) {
     if (billValue <= 3000) {
